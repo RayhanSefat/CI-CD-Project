@@ -1,19 +1,18 @@
-name: Node.js CI/CD Pipeline
+name: Node.js CI with Vercel Deployment
 
 on:
   push:
-    branches: [ "master" ]
+    branches: [ "main" ]
   pull_request:
-    branches: [ "master" ]
+    branches: [ "main" ]
+  workflow_dispatch: 
 
 jobs:
   build:
     runs-on: ubuntu-latest
-
     strategy:
       matrix:
-        node-version: [20.x]
-
+        node-version: [18.x, 20.x, 22.x]
     steps:
     - uses: actions/checkout@v4
     - name: Use Node.js ${{ matrix.node-version }}
@@ -27,8 +26,7 @@ jobs:
 
   deploy:
     runs-on: ubuntu-latest
-    needs: build  # Ensures this job depends on 'build'
-    if: ${{ success() }} # Explicitly checks if the 'build' job succeeded
+    needs: build
     steps:
     - uses: actions/checkout@v4
     - name: Install Vercel CLI
@@ -37,3 +35,4 @@ jobs:
       env:
         VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
       run: vercel --prod --yes --token $VERCEL_TOKEN
+      
